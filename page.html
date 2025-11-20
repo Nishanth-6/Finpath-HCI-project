@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinPath Mobile Prototype</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Phone Container */
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+            border: 12px solid #1f1f1f;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #1f1f1f;
+            border-radius: 0 0 20px 20px;
+            z-index: 1000;
+        }
+
+        /* Screen Container */
+        .screen {
+            display: none;
+            height: 100%;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            background: #6366f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            padding-top: 10px;
+            color: white;
+            font-size: 14px;
+        }
+
+        /* Header */
+        .header {
+            background: #6366f1;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .profile-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+
+        /* Greeting */
+        .greeting {
+            margin-bottom: 24px;
+        }
+
+        .greeting h2 {
+            font-size: 24px;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .greeting p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Warning Banner (Primary Tier) */
+        .warning-banner {
+            background: #fef2f2;
+            border: 2px solid #dc2626;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .warning-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .warning-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #991b1b;
+            text-transform: uppercase;
+        }
+
+        .expand-toggle {
+            font-size: 18px;
+            cursor: pointer;
+            color: #dc2626;
+        }
+
+        .warning-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .warning-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .warning-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .warning-text {
+            flex: 1;
+        }
+
+        .warning-text-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #dc2626;
+            margin-bottom: 4px;
+        }
+
+        .warning-text-desc {
+            font-size: 12px;
+            color: #7f1d1d;
+            line-height: 1.4;
+        }
+
+        /* Quick Actions Grid */
+        .quick-actions {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .action-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-card:active {
+            transform: scale(0.98);
+            background: #f9fafb;
+        }
+
+        .action-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .action-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Next Step Card */
+        .next-step-card {
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .next-step-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+
+        .next-step-subtitle {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .feature-list {
+            margin-bottom: 12px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .feature-bullet {
+            width: 4px;
+            height: 4px;
+            background: #6b7280;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Expansion Panel (Secondary Tier) */
+        .expansion-panel {
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .expansion-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .expansion-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .expansion-content-text {
+            flex: 1;
+        }
+
+        .expansion-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .expansion-preview {
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .expansion-arrow {
+            font-size: 16px;
+            color: #9ca3af;
+            transition: transform 0.3s;
+        }
+
+        .expansion-panel.expanded .expansion-arrow {
+            transform: rotate(180deg);
+        }
+
+        .expansion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 16px;
+        }
+
+        .expansion-panel.expanded .expansion-body {
+            max-height: 500px;
+            padding: 0 16px 16px 16px;
+        }
+
+        .expansion-body-content {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        /* Input Field */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        /* Result Display */
+        .result-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .result-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .result-subtext {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* Progress Gauge */
+        .gauge-container {
+            margin: 24px 0;
+        }
+
+        .gauge {
+            width: 100%;
+            height: 12px;
+            background: #e5e7eb;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .gauge-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #ef4444 100%);
+            border-radius: 6px;
+            transition: width 0.5s ease-out;
+        }
+
+        .gauge-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .gauge-marker {
+            position: relative;
+            height: 24px;
+        }
+
+        .gauge-marker-line {
+            position: absolute;
+            width: 2px;
+            height: 24px;
+            background: #1f2937;
+            left: 30%;
+        }
+
+        .gauge-marker-label {
+            position: absolute;
+            top: 28px;
+            left: 30%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+
+        .info-box-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 4px;
+        }
+
+        .info-box-text {
+            font-size: 13px;
+            color: #1e40af;
+            line-height: 1.5;
+        }
+
+        /* Comparison Cards */
+        .comparison-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .comparison-card:active {
+            transform: scale(0.98);
+            border-color: #3b82f6;
+        }
+
+        .comparison-card.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .comparison-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .comparison-bank-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .comparison-fee {
+            font-size: 18px;
+            font-weight: 700;
+            color: #059669;
+        }
+
+        .comparison-features {
+            margin-bottom: 12px;
+        }
+
+        .comparison-feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .check-icon {
+            color: #10b981;
+            font-size: 16px;
+        }
+
+        /* Filter Chips */
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 8px 0;
+            margin-bottom: 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .filter-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #4b5563;
+            white-space: nowrap;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .filter-chip.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        /* Button Styles */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 56px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #3b82f6;
+            border: 2px solid #3b82f6;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 375px;
+            max-width: 100%;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 8px 16px;
+            transition: all 0.2s;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            color: #9ca3af;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .nav-item.active .nav-icon,
+        .nav-item.active .nav-label {
+            color: #3b82f6;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .voice-icon {
+            font-size: 20px;
+            color: #6b7280;
+            cursor: pointer;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 24px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -18px;
+            top: 20px;
+            width: 2px;
+            height: calc(100% - 20px);
+            background: #e5e7eb;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-date {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .timeline-description {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        .timeline-score {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        /* Success Message */
+        .success-message {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            color: #10b981;
+            margin-bottom: 16px;
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .success-text {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 90px;
+            right: calc(50% - 167px);
+            width: 56px;
+            height: 56px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Screen Controls */
+        .screen-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            background: rgba(0,0,0,0.8);
+            padding: 12px 20px;
+            border-radius: 24px;
+            z-index: 2000;
+        }
+
+        .screen-controls button {
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .screen-controls button:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-notch"></div>
+
+        <!-- SCREEN 1: HOME/DASHBOARD -->
+        <div class="screen active" id="screen-home">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>100% 📶</span>
+            </div>
+            <div class="header">
+                <div class="header-title">FinPath</div>
+                <div class="profile-icon">👤</div>
+            </div>
+
+            <div class="content">
+                <div class="greeting">
+                    <h2>Hi, Priya 👋</h2>
+                    <p>F-1 Student • UIC</p>
+                </div>
+
+                <!-- Primary Tier: Warning Banner -->
+                <div class="warning-banner">
+                    <div class="warning-header">
+                        <div class="warning-title">
+                            ⚡ CRITICAL REMINDERS
+                        </div>
+                        <div class="expand-toggle" onclick="toggleWarnings()">▼</div>
+                    </div>
+                    <div id="warnings-content">
+                        <div class="warning-item">
+                            <div class="warning-icon">⚠️</div>
+                            <div class="warning-text">
+                                <div class="warning-text-title">Space applications 6 months</div>
+                                <div class="warning-text-desc">Each application = -5 to -10 points</div>
+                            </div>
+                        </div>
+                        <div class="warning-item">
+                            <div class="warning-icon">⚠️</div>
+                            <div class="warning-text">
+                                <div class="warning-text-title">Keep balance under 30%</div>
+                                <div class="warning-text-desc">Affects 30% of your credit score</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <div class="section-title">Financial Tools</div>
+                    <div class="action-grid">
+                        <div class="action-card" onclick="navigateTo('screen-credit')">
+                            <div class="action-icon">💳</div>
+                            <div class="action-label">Credit Building</div>
+                        </div>
+                        <div class="action-card" onclick="navigateTo('screen-calculator')">
+                            <div class="action-icon">🧮</div>
+                            <div class="action-label">Calculator</div>
+                        </div>
+                        <div class="action-card" onclick="navigateTo('screen-comparison')">
+                            <div class="action-icon">🏦</div>
+                            <div class="action-label">Compare Banks</div>
+                        </div>
+                        <div class="action-card" onclick="navigateTo('screen-search')">
+                            <div class="action-icon">📄</div>
+                            <div class="action-label">Tax Filing</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Tracker -->
+                <div class="section-title">Your Progress</div>
+                <div class="next-step-card">
+                    <div class="next-step-title">🎯 NEXT MILESTONE</div>
+                    <div class="next-step-subtitle">Apply for secured credit card</div>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <div class="feature-bullet"></div>
+                            <div>✓ Got SSN</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-bullet"></div>
+                            <div>✓ Campus job secured</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-bullet"></div>
+                            <div>○ Apply for credit card (Next)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item" onclick="navigateTo('screen-credit')">
+                    <div class="nav-icon">💳</div>
+                    <div class="nav-label">Credit</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">💰</div>
+                    <div class="nav-label">Transfer</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">📊</div>
+                    <div class="nav-label">Progress</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: CREDIT BUILDING DETAIL -->
+        <div class="screen" id="screen-credit">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>100% 📶</span>
+            </div>
+            <div class="header">
+                <div class="back-btn" onclick="navigateTo('screen-home')">←</div>
+                <div class="header-title">Credit Building</div>
+                <div></div>
+            </div>
+
+            <div class="content">
+                <div class="section-title">For F-1 Students</div>
+
+                <!-- Primary Tier: Critical Warnings -->
+                <div class="warning-banner">
+                    <div class="warning-header">
+                        <div class="warning-title">⚡ MUST KNOW</div>
+                    </div>
+                    <div class="warning-item">
+                        <div class="warning-icon">⚠️</div>
+                        <div class="warning-text">
+                            <div class="warning-text-title">CRITICAL: Space applications 6 months</div>
+                            <div class="warning-text-desc">Each creates hard inquiry lowering score 5-10 points</div>
+                        </div>
+                    </div>
+                    <div class="warning-item">
+                        <div class="warning-icon">⚠️</div>
+                        <div class="warning-text">
+                            <div class="warning-text-title">Keep balance below 30%</div>
+                            <div class="warning-text-desc">Affects 30% of your credit score</div>
+                        </div>
+                    </div>
+                    <div class="warning-item">
+                        <div class="warning-icon">⚠️</div>
+                        <div class="warning-text">
+                            <div class="warning-text-title">Never miss payments</div>
+                            <div class="warning-text-desc">35% of score, late = 50-100 point drop</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Step -->
+                <div class="next-step-card">
+                    <div class="next-step-title">NEXT STEP</div>
+                    <div class="next-step-subtitle">Discover it Secured Card</div>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <div class="feature-bullet"></div>
+                            <div>No annual fee</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-bullet"></div>
+                            <div>$200 minimum deposit</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-bullet"></div>
+                            <div>Accepts F-1 students with SSN</div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary">Compare</button>
+                        <button class="btn btn-primary" onclick="navigateTo('screen-success')">Apply Now</button>
+                    </div>
+                </div>
+
+                <!-- Secondary Tier: Expansion Panels -->
+                <div class="section-title">Learn More</div>
+                
+                <div class="expansion-panel" onclick="togglePanel(this)">
+                    <div class="expansion-header">
+                        <div class="expansion-icon">ℹ️</div>
+                        <div class="expansion-content-text">
+                            <div class="expansion-title">Understanding credit scores</div>
+                            <div class="expansion-preview">How scores work, what factors matter • 3 key concepts</div>
+                        </div>
+                        <div class="expansion-arrow">▼</div>
+                    </div>
+                    <div class="expansion-body">
+                        <div class="expansion-body-content">
+                            <strong>Credit Score Range: 300-850</strong><br><br>
+                            <strong>Score Factors:</strong><br>
+                            • Payment history (35%)<br>
+                            • Credit utilization (30%)<br>
+                            • Length of history (15%)<br>
+                            • New credit (10%)<br>
+                            • Credit mix (10%)<br><br>
+                            <strong>Why start at zero?</strong><br>
+                            U.S. system only sees YOUR history, not family relationships like many other countries.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="expansion-panel" onclick="togglePanel(this)">
+                    <div class="expansion-header">
+                        <div class="expansion-icon">💡</div>
+                        <div class="expansion-content-text">
+                            <div class="expansion-title">Your 12-month timeline</div>
+                            <div class="expansion-preview">What to expect: approval → first score → improvements</div>
+                        </div>
+                        <div class="expansion-arrow">▼</div>
+                    </div>
+                    <div class="expansion-body">
+                        <div class="expansion-body-content">
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-date">Month 1-3</div>
+                                    <div class="timeline-description">Apply, get approved, receive card</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-date">Month 4-6</div>
+                                    <div class="timeline-description">Make small purchases, pay full balance monthly</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-date">Month 7-9</div>
+                                    <div class="timeline-description">Credit score appears</div>
+                                    <div class="timeline-score">650-680 range</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-date">Month 10-12</div>
+                                    <div class="timeline-description">Score improves with consistent payment history</div>
+                                    <div class="timeline-score">680-710 range</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="expansion-panel" onclick="togglePanel(this)">
+                    <div class="expansion-header">
+                        <div class="expansion-icon">📋</div>
+                        <div class="expansion-content-text">
+                            <div class="expansion-title">Documentation checklist</div>
+                            <div class="expansion-preview">What you'll need: SSN, income proof, ID, address</div>
+                        </div>
+                        <div class="expansion-arrow">▼</div>
+                    </div>
+                    <div class="expansion-body">
+                        <div class="expansion-body-content">
+                            <strong>Required Documents:</strong><br><br>
+                            ✓ Social Security Number<br>
+                            ✓ Proof of income (campus job letter, bank statements)<br>
+                            ✓ Valid government ID (passport, driver license)<br>
+                            ✓ Proof of address (utility bill, lease)<br><br>
+                            <em>Some cards accept ITIN if no SSN yet</em>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="navigateTo('screen-home')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item active">
+                    <div class="nav-icon">💳</div>
+                    <div class="nav-label">Credit</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">💰</div>
+                    <div class="nav-label">Transfer</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">📊</div>
+                    <div class="nav-label">Progress</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: UTILIZATION CALCULATOR -->
+        <div class="screen" id="screen-calculator">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>100% 📶</span>
+            </div>
+            <div class="header">
+                <div class="back-btn" onclick="navigateTo('screen-home')">←</div>
+                <div class="header-title">Utilization Calculator</div>
+                <div></div>
+            </div>
+
+            <div class="content">
+                <div class="section-title">Calculate Safe Spending</div>
+
+                <div class="input-group">
+                    <label class="input-label">Your Credit Limit ($)</label>
+                    <input type="number" class="input-field" id="credit-limit" placeholder="500" value="500" oninput="calculateUtilization()">
+                </div>
+
+                <div class="result-card" id="result-display" style="display: none;">
+                    <div class="result-label">Keep spending below</div>
+                    <div class="result-value" id="safe-amount">$150</div>
+                    <div class="result-subtext">To maintain 30% utilization</div>
+                </div>
+
+                <div class="gauge-container" id="gauge-display" style="display: none;">
+                    <div class="gauge">
+                        <div class="gauge-fill" id="gauge-fill" style="width: 30%;"></div>
+                    </div>
+                    <div class="gauge-labels">
+                        <span>$0</span>
+                        <span>Safe Zone</span>
+                        <span id="limit-display">$500</span>
+                    </div>
+                    <div class="gauge-marker">
+                        <div class="gauge-marker-line"></div>
+                        <div class="gauge-marker-label">30% ▲</div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-box-title">💡 Why 30% matters</div>
+                    <div class="info-box-text">
+                        Credit utilization accounts for 30% of your credit score. Keeping your balance below 30% of your limit shows lenders you manage credit responsibly.
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="calculateUtilization()">Calculate</button>
+
+                <div class="info-box" style="margin-top: 24px;">
+                    <div class="info-box-title">📝 Example</div>
+                    <div class="info-box-text">
+                        If your credit limit is $500:<br>
+                        • Spend up to $150 (30%)<br>
+                        • Pay full balance by due date<br>
+                        • Your score stays healthy ✓
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="navigateTo('screen-home')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">💳</div>
+                    <div class="nav-label">Credit</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">💰</div>
+                    <div class="nav-label">Transfer</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">📊</div>
+                    <div class="nav-label">Progress</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: BANK COMPARISON -->
+        <div class="screen" id="screen-comparison">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>100% 📶</span>
+            </div>
+            <div class="header">
+                <div class="back-btn" onclick="navigateTo('screen-home')">←</div>
+                <div class="header-title">Compare Banks</div>
+                <div style="font-size: 20px; cursor: pointer;">⚙️</div>
+            </div>
+
+            <div class="content">
+                <div class="section-title">Filter by your needs</div>
+                
+                <div class="filter-chips">
+                    <div class="filter-chip active">Accepts ITIN</div>
+                    <div class="filter-chip active">No minimum</div>
+                    <div class="filter-chip">Student friendly</div>
+                    <div class="filter-chip">No monthly fee</div>
+                </div>
+
+                <div class="section-title">3 banks match your filters</div>
+
+                <div class="comparison-card selected" onclick="selectBank(this)">
+                    <div class="comparison-header">
+                        <div class="comparison-bank-name">Chase Secure Banking</div>
+                        <div class="comparison-fee">$0/mo</div>
+                    </div>
+                    <div class="comparison-features">
+                        <div class="comparison-feature">
+                            <div class="check-icon">✓</div>
+                            <div>Accepts ITIN (no SSN needed)</div>
+                        </div>
+                        <div class="comparison-feature">
+                            <div class="check-icon">✓</div>
+                            <div>No minimum balance required</div>
+                        </div>
+                        <div class="comparison-feature">
+                            <div class="check-icon">✓</div>
+                            <div>Free debit card</div>
+                        </div>
+                        <div class="comparison-feature">
+                            <div class="check-icon">✓</div>
+                            <div>Mobile check deposit</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card" onclick="selectBank(this)">
+                    <div class="comparison-header">
+                        <div class="comparison-bank-name">Bank of America Advantage</div>
+                        <div class="comparison-fee">$4.95/mo</div>
+                    </div>
+                    <div class="comparison-features">
+                        <div class="comparison-feature">
+                            <div class="check-icon">✓</div>
+                            <div>Accepts ITIN</div>
+                        </div>
+                        <div class="comparison-feature">
+                            <div class="check-icon">✓</div>
+                            <div>$100 minimum balance</div>
+                        </div>
+                        <div class="comparison-feature">
+                            <div class="check-icon">✓</div>
+                            <div>Zelle integration</div>
+                        </div>
+                        <div class="comparison-feature">
+                            <div class="check-icon">✓</div>
+                            <div>Nationwide ATMs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card" onclick="selectBank(this)">
+                    <div class="comparison-header">
+                        <div class="comparison-bank-name">Wells Fargo Everyday</div>
+                        <div class="comparison-fee">$5/mo</div>
+                    </div>
+                    <div class="comparison-features">
+                        <div class="comparison-feature">
+                            <div class="check-icon">✓</div>
+                            <div>Accepts ITIN</div>
+                        </div>
+                        <div class="comparison-feature">
+                            <div class="check-icon">✓</div>
+                            <div>$500 min balance OR direct deposit</div>
+                        </div>
+                        <div class="comparison-feature">
+                            <div class="check-icon">✓</div>
+                            <div>Overdraft protection</div>
+                        </div>
+                        <div class="comparison-feature">
+                            <div class="check-icon">✓</div>
+                            <div>Student discounts available</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-box-title">🎯 Best match for you</div>
+                    <div class="info-box-text">
+                        Chase Secure Banking requires no SSN or minimum balance - perfect for newcomers building their financial foundation.
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="navigateTo('screen-bank-detail')">View Details</button>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="navigateTo('screen-home')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">💳</div>
+                    <div class="nav-label">Credit</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">💰</div>
+                    <div class="nav-label">Transfer</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">📊</div>
+                    <div class="nav-label">Progress</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: SEARCH/BROWSE -->
+        <div class="screen" id="screen-search">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>100% 📶</span>
+            </div>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search topics, questions..." value="tax filing F-1">
+                <div class="voice-icon">🎤</div>
+            </div>
+
+            <div class="content">
+                <div class="section-title">Search Results</div>
+
+                <div class="comparison-card">
+                    <div class="comparison-bank-name" style="margin-bottom: 8px;">Tax Filing Guide for F-1 Students</div>
+                    <div class="comparison-features">
+                        <div class="comparison-feature">
+                            <div style="color: #6b7280;">📄</div>
+                            <div>Complete guide to filing 1040-NR form</div>
+                        </div>
+                        <div class="comparison-feature">
+                            <div style="color: #6b7280;">📄</div>
+                            <div>Deadline: April 15, 2025</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card">
+                    <div class="comparison-bank-name" style="margin-bottom: 8px;">Free VITA Tax Assistance</div>
+                    <div class="comparison-features">
+                        <div class="comparison-feature">
+                            <div style="color: #6b7280;">📍</div>
+                            <div>UIC Student Center, Room 300</div>
+                        </div>
+                        <div class="comparison-feature">
+                            <div style="color: #6b7280;">📅</div>
+                            <div>Book appointment online</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card">
+                    <div class="comparison-bank-name" style="margin-bottom: 8px;">Understanding Tax Treaties</div>
+                    <div class="comparison-features">
+                        <div class="comparison-feature">
+                            <div style="color: #6b7280;">📄</div>
+                            <div>India-US tax treaty benefits for students</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title" style="margin-top: 32px;">Popular Topics</div>
+                
+                <div class="filter-chips">
+                    <div class="filter-chip">Credit Cards</div>
+                    <div class="filter-chip">Bank Accounts</div>
+                    <div class="filter-chip">Money Transfer</div>
+                    <div class="filter-chip">Tax Filing</div>
+                    <div class="filter-chip">SSN Application</div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="navigateTo('screen-home')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">💳</div>
+                    <div class="nav-label">Credit</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">💰</div>
+                    <div class="nav-label">Transfer</div>
+                </div>
+                <div class="nav-item active">
+                    <div class="nav-icon">🔍</div>
+                    <div class="nav-label">Search</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 6: BANK DETAIL -->
+        <div class="screen" id="screen-bank-detail">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>100% 📶</span>
+            </div>
+            <div class="header">
+                <div class="back-btn" onclick="navigateTo('screen-comparison')">←</div>
+                <div class="header-title">Chase Secure Banking</div>
+                <div></div>
+            </div>
+
+            <div class="content">
+                <div class="result-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <div class="result-label">Monthly Fee</div>
+                    <div class="result-value">$0</div>
+                    <div class="result-subtext">No hidden charges</div>
+                </div>
+
+                <div class="section-title">Key Features</div>
+                
+                <div class="expansion-panel expanded">
+                    <div class="expansion-body" style="max-height: none; padding: 16px;">
+                        <div class="expansion-body-content">
+                            <strong style="color: #059669;">✓ Perfect for Newcomers</strong><br><br>
+                            • No SSN required (ITIN accepted)<br>
+                            • No minimum balance<br>
+                            • No overdraft fees<br>
+                            • Free debit card<br>
+                            • Mobile check deposit<br>
+                            • Access to 16,000+ ATMs<br>
+                            • Online and mobile banking<br>
+                            • Zelle for instant transfers
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">What You Need</div>
+                
+                <div class="info-box">
+                    <div class="info-box-title">📋 Required Documents</div>
+                    <div class="info-box-text">
+                        • Government-issued ID (passport)<br>
+                        • ITIN or SSN<br>
+                        • Proof of address (utility bill, lease)<br>
+                        • Initial deposit: $25
+                    </div>
+                </div>
+
+                <div class="section-title">Nearest Branch</div>
+                
+                <div class="comparison-card">
+                    <div class="comparison-bank-name" style="margin-bottom: 8px;">Chase - Roosevelt Road</div>
+                    <div class="comparison-features">
+                        <div class="comparison-feature">
+                            <div style="color: #6b7280;">📍</div>
+                            <div>1.2 miles from UIC campus</div>
+                        </div>
+                        <div class="comparison-feature">
+                            <div style="color: #6b7280;">🕐</div>
+                            <div>Open Mon-Fri 9AM-5PM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary">Find Branch</button>
+                    <button class="btn btn-primary">Open Account</button>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="navigateTo('screen-home')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">💳</div>
+                    <div class="nav-label">Credit</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">💰</div>
+                    <div class="nav-label">Transfer</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">📊</div>
+                    <div class="nav-label">Progress</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 7: SUCCESS/CONFIRMATION -->
+        <div class="screen" id="screen-success">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>100% 📶</span>
+            </div>
+            <div class="header">
+                <div class="back-btn" onclick="navigateTo('screen-home')">←</div>
+                <div class="header-title">Application Started</div>
+                <div></div>
+            </div>
+
+            <div class="content">
+                <div class="success-message">
+                    <div class="success-icon">✓</div>
+                    <div class="success-title">Great Choice!</div>
+                    <div class="success-text">
+                        You're being redirected to Discover's secure application page. 
+                        <br><br>
+                        Remember: This is your ONE application for the next 6 months.
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-box-title">⏰ After You Apply</div>
+                    <div class="info-box-text">
+                        • Decision within 5-7 business days<br>
+                        • Check your email for updates<br>
+                        • Card arrives in 7-10 days if approved
+                    </div>
+                </div>
+
+                <div class="section-title">What's Next?</div>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">Today</div>
+                        <div class="timeline-description">Submit application</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Week 1</div>
+                        <div class="timeline-description">Receive approval decision</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Week 2-3</div>
+                        <div class="timeline-description">Card arrives, activate it</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Month 3+</div>
+                        <div class="timeline-description">Make first purchases, pay on time</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="navigateTo('screen-home')">Back to Home</button>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="navigateTo('screen-home')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">💳</div>
+                    <div class="nav-label">Credit</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">💰</div>
+                    <div class="nav-label">Transfer</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">📊</div>
+                    <div class="nav-label">Progress</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen Navigation Controls -->
+    <div class="screen-controls">
+        <button onclick="navigateTo('screen-home')">Home</button>
+        <button onclick="navigateTo('screen-credit')">Credit</button>
+        <button onclick="navigateTo('screen-calculator')">Calculator</button>
+        <button onclick="navigateTo('screen-comparison')">Banks</button>
+        <button onclick="navigateTo('screen-search')">Search</button>
+    </div>
+
+    <script>
+        // Navigation
+        function navigateTo(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            document.getElementById(screenId).scrollTop = 0;
+        }
+
+        // Toggle warnings
+        function toggleWarnings() {
+            const content = document.getElementById('warnings-content');
+            const toggle = document.querySelector('.expand-toggle');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggle.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                toggle.textContent = '▶';
+            }
+        }
+
+        // Toggle expansion panel
+        function togglePanel(panel) {
+            panel.classList.toggle('expanded');
+        }
+
+        // Select bank
+        function selectBank(card) {
+            document.querySelectorAll('.comparison-card').forEach(c => {
+                c.classList.remove('selected');
+            });
+            card.classList.add('selected');
+        }
+
+        // Calculate utilization
+        function calculateUtilization() {
+            const limit = parseFloat(document.getElementById('credit-limit').value) || 500;
+            const safeAmount = Math.floor(limit * 0.3);
+            
+            document.getElementById('safe-amount').textContent = '$' + safeAmount;
+            document.getElementById('limit-display').textContent = '$' + limit;
+            document.getElementById('result-display').style.display = 'block';
+            document.getElementById('gauge-display').style.display = 'block';
+            document.getElementById('gauge-fill').style.width = '30%';
+        }
+
+        // Initialize calculator on load
+        window.addEventListener('load', () => {
+            calculateUtilization();
+        });
+    </script>
+</body>
+</html>
