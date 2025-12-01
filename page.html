@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinPath Mobile Prototype</title>
+    <title>FinPath Mobile Prototype - Updated</title>
     <style>
         * {
             margin: 0;
@@ -284,13 +284,37 @@
             flex-shrink: 0;
         }
 
-        /* Expansion Panel (Secondary Tier) */
+        /* Expansion Panel (Secondary Tier) - UPDATED: Better affordance */
         .expansion-panel {
             background: #fafafa;
             border: 1px solid #e5e7eb;
             border-radius: 16px;
             margin-bottom: 12px;
             overflow: hidden;
+            position: relative;
+        }
+
+        /* ADDED: Animation hint for first-time users */
+        .expansion-panel::after {
+            content: '';
+            position: absolute;
+            right: 16px;
+            top: 20px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.1);
+            animation: pulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0; }
+            50% { transform: scale(1.5); opacity: 0.3; }
+        }
+
+        .expansion-panel.expanded::after {
+            display: none;
         }
 
         .expansion-header {
@@ -324,6 +348,18 @@
             line-height: 1.4;
         }
 
+        /* ADDED: Subtle "Tap to expand" hint */
+        .expansion-hint {
+            font-size: 11px;
+            color: #3b82f6;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .expansion-panel.expanded .expansion-hint {
+            display: none;
+        }
+
         .expansion-arrow {
             font-size: 16px;
             color: #9ca3af;
@@ -342,7 +378,7 @@
         }
 
         .expansion-panel.expanded .expansion-body {
-            max-height: 500px;
+            max-height: 800px;
             padding: 0 16px 16px 16px;
         }
 
@@ -352,7 +388,46 @@
             line-height: 1.6;
         }
 
-        /* Input Field */
+        /* ADDED: Tooltip for financial terms */
+        .term-tooltip {
+            position: relative;
+            display: inline;
+            color: #3b82f6;
+            border-bottom: 1px dashed #3b82f6;
+            cursor: help;
+        }
+
+        .term-tooltip:hover .tooltip-content {
+            display: block;
+        }
+
+        .tooltip-content {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 8px;
+        }
+
+        .tooltip-content::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1f2937;
+        }
+
+        /* Input Field - UPDATED: Added helper text */
         .input-group {
             margin-bottom: 20px;
         }
@@ -363,6 +438,14 @@
             color: #374151;
             margin-bottom: 8px;
             display: block;
+        }
+
+        /* ADDED: Helper text styling */
+        .input-helper {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
 
         .input-field {
@@ -379,7 +462,7 @@
             border-color: #3b82f6;
         }
 
-        /* Result Display */
+        /* Result Display - UPDATED: Interactive, shows breakdown */
         .result-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 16px;
@@ -387,6 +470,12 @@
             text-align: center;
             color: white;
             margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .result-card:hover {
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
         }
 
         .result-label {
@@ -404,6 +493,50 @@
         .result-subtext {
             font-size: 13px;
             opacity: 0.9;
+        }
+
+        /* ADDED: Calculation breakdown */
+        .calculation-breakdown {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        /* ADDED: Color zones for spending ranges */
+        .spending-zones {
+            display: flex;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 40px;
+        }
+
+        .zone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            flex: 1;
+        }
+
+        .zone-safe {
+            background: #10b981;
+            flex: 0.3;
+        }
+
+        .zone-caution {
+            background: #f59e0b;
+            flex: 0.4;
+        }
+
+        .zone-risky {
+            background: #ef4444;
+            flex: 0.3;
         }
 
         /* Progress Gauge */
@@ -457,7 +590,7 @@
             color: #1f2937;
         }
 
-        /* Info Box */
+        /* Info Box - UPDATED: Consequence preview added */
         .info-box {
             background: #eff6ff;
             border-left: 4px solid #3b82f6;
@@ -479,16 +612,62 @@
             line-height: 1.5;
         }
 
-        /* Comparison Cards */
+        /* ADDED: Consequence warning box */
+        .consequence-box {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+
+        .consequence-box-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #991b1b;
+            margin-bottom: 4px;
+        }
+
+        .consequence-box-text {
+            font-size: 13px;
+            color: #991b1b;
+            line-height: 1.5;
+        }
+
+        /* Comparison Cards - UPDATED: Side-by-side layout */
+        .comparison-container {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .comparison-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .comparison-container::-webkit-scrollbar-track {
+            background: #f3f4f6;
+            border-radius: 3px;
+        }
+
+        .comparison-container::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 3px;
+        }
+
         .comparison-card {
             background: white;
             border: 2px solid #e5e7eb;
             border-radius: 16px;
             padding: 16px;
-            margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.2s;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            min-width: 280px;
+            flex-shrink: 0;
         }
 
         .comparison-card:active {
@@ -526,7 +705,7 @@
 
         .comparison-feature {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 8px;
             padding: 4px 0;
             font-size: 13px;
@@ -536,9 +715,46 @@
         .check-icon {
             color: #10b981;
             font-size: 16px;
+            flex-shrink: 0;
         }
 
-        /* Filter Chips */
+        /* ADDED: Comparison table view */
+        .comparison-table {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .comparison-table-row {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .comparison-table-row:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-table-cell {
+            flex: 1;
+            padding: 12px;
+            font-size: 12px;
+        }
+
+        .comparison-table-header {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .comparison-table-label {
+            flex: 0 0 100px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        /* Filter Chips - UPDATED: Clearer labels */
         .filter-chips {
             display: flex;
             gap: 8px;
@@ -568,6 +784,82 @@
             background: #3b82f6;
             color: white;
             border-color: #3b82f6;
+        }
+
+        /* ADDED: Filter description */
+        .filter-description {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        /* Deadline Items - UPDATED: Show days remaining and context */
+        .deadline-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .deadline-item:active {
+            transform: scale(0.98);
+        }
+
+        .deadline-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .deadline-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* ADDED: Days remaining badge */
+        .days-remaining {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .days-remaining.urgent {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .deadline-date {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        /* ADDED: Why this matters section */
+        .deadline-why {
+            background: #f0f9ff;
+            border-left: 3px solid #3b82f6;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #1e40af;
+            line-height: 1.4;
+        }
+
+        /* ADDED: Next steps */
+        .deadline-action {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #059669;
+            font-weight: 500;
         }
 
         /* Button Styles */
@@ -825,6 +1117,18 @@
         .screen-controls {
             display: none;
         }
+
+        /* ADDED: Recommended badge */
+        .recommended-badge {
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
@@ -871,6 +1175,37 @@
                                 <div class="warning-text-desc">Affects 30% of your credit score</div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- UPDATED: Upcoming Deadlines with days remaining -->
+                <div class="section-title">Upcoming Deadlines</div>
+                
+                <div class="deadline-item" onclick="toggleDeadlineDetail(this)">
+                    <div class="deadline-header">
+                        <div class="deadline-title">Tax Filing Deadline</div>
+                        <div class="days-remaining urgent">14 days left</div>
+                    </div>
+                    <div class="deadline-date">📅 April 15, 2025</div>
+                    <div class="deadline-why" style="display: none;">
+                        <strong>Why this matters:</strong> F-1 students must file Form 8843 and 1040-NR. Missing this deadline can affect your visa status and future tax refunds.
+                    </div>
+                    <div class="deadline-action" style="display: none;">
+                        ✓ What to do: File Form 8843 at UIC VITA center (Room 300) by April 15
+                    </div>
+                </div>
+
+                <div class="deadline-item" onclick="toggleDeadlineDetail(this)">
+                    <div class="deadline-header">
+                        <div class="deadline-title">Credit Card Payment Due</div>
+                        <div class="days-remaining">5 days left</div>
+                    </div>
+                    <div class="deadline-date">📅 January 10, 2025</div>
+                    <div class="deadline-why" style="display: none;">
+                        <strong>Why this matters:</strong> Late payments can drop your credit score by 50-100 points and affect 35% of your overall score.
+                    </div>
+                    <div class="deadline-action" style="display: none;">
+                        ✓ What to do: Pay minimum $25 or full balance through your bank app
                     </div>
                 </div>
 
@@ -954,7 +1289,7 @@
             <div class="content">
                 <div class="section-title">For F-1 Students</div>
 
-                <!-- Primary Tier: Critical Warnings -->
+                <!-- UPDATED: Warning banner also on Credit screen -->
                 <div class="warning-banner">
                     <div class="warning-header">
                         <div class="warning-title">⚡ MUST KNOW</div>
@@ -1006,7 +1341,7 @@
                     </div>
                 </div>
 
-                <!-- Secondary Tier: Expansion Panels -->
+                <!-- UPDATED: Secondary Tier with better affordance -->
                 <div class="section-title">Learn More</div>
                 
                 <div class="expansion-panel" onclick="togglePanel(this)">
@@ -1015,6 +1350,7 @@
                         <div class="expansion-content-text">
                             <div class="expansion-title">Understanding credit scores</div>
                             <div class="expansion-preview">How scores work, what factors matter • 3 key concepts</div>
+                            <div class="expansion-hint">Tap to expand ↓</div>
                         </div>
                         <div class="expansion-arrow">▼</div>
                     </div>
@@ -1023,7 +1359,7 @@
                             <strong>Credit Score Range: 300-850</strong><br><br>
                             <strong>Score Factors:</strong><br>
                             • Payment history (35%)<br>
-                            • Credit utilization (30%)<br>
+                            • <span class="term-tooltip">Credit utilization<span class="tooltip-content">% of credit limit you use</span></span> (30%)<br>
                             • Length of history (15%)<br>
                             • New credit (10%)<br>
                             • Credit mix (10%)<br><br>
@@ -1039,6 +1375,7 @@
                         <div class="expansion-content-text">
                             <div class="expansion-title">Your 12-month timeline</div>
                             <div class="expansion-preview">What to expect: approval → first score → improvements</div>
+                            <div class="expansion-hint">Tap to expand ↓</div>
                         </div>
                         <div class="expansion-arrow">▼</div>
                     </div>
@@ -1074,6 +1411,7 @@
                         <div class="expansion-content-text">
                             <div class="expansion-title">Documentation checklist</div>
                             <div class="expansion-preview">What you'll need: SSN, income proof, ID, address</div>
+                            <div class="expansion-hint">Tap to expand ↓</div>
                         </div>
                         <div class="expansion-arrow">▼</div>
                     </div>
@@ -1110,7 +1448,7 @@
             </div>
         </div>
 
-        <!-- SCREEN 3: UTILIZATION CALCULATOR -->
+        <!-- SCREEN 3: UTILIZATION CALCULATOR - HEAVILY UPDATED -->
         <div class="screen" id="screen-calculator">
             <div class="status-bar">
                 <span>9:41</span>
@@ -1125,18 +1463,33 @@
             <div class="content">
                 <div class="section-title">Calculate Safe Spending</div>
 
+                <!-- UPDATED: Added helper text to clarify field -->
                 <div class="input-group">
                     <label class="input-label">Your Credit Limit ($)</label>
+                    <div class="input-helper">The maximum amount your card company approved (found on your card agreement or app)</div>
                     <input type="number" class="input-field" id="credit-limit" placeholder="500" value="500" oninput="calculateUtilization()">
                 </div>
 
-                <div class="result-card" id="result-display" style="display: none;">
+                <!-- UPDATED: Interactive result card with breakdown -->
+                <div class="result-card" id="result-display" onclick="toggleBreakdown()">
                     <div class="result-label">Keep spending below</div>
                     <div class="result-value" id="safe-amount">$150</div>
                     <div class="result-subtext">To maintain 30% utilization</div>
+                    <div class="calculation-breakdown" id="breakdown" style="display: none;">
+                        <strong>Calculation:</strong><br>
+                        $<span id="limit-value">500</span> × 30% = $<span id="safe-value">150</span>
+                    </div>
                 </div>
 
-                <div class="gauge-container" id="gauge-display" style="display: none;">
+                <!-- ADDED: Visual spending zones -->
+                <div class="section-title">Spending Zones</div>
+                <div class="spending-zones">
+                    <div class="zone zone-safe">SAFE<br>0-30%</div>
+                    <div class="zone zone-caution">CAUTION<br>30-70%</div>
+                    <div class="zone zone-risky">RISKY<br>70-100%</div>
+                </div>
+
+                <div class="gauge-container" id="gauge-display">
                     <div class="gauge">
                         <div class="gauge-fill" id="gauge-fill" style="width: 30%;"></div>
                     </div>
@@ -1154,19 +1507,25 @@
                 <div class="info-box">
                     <div class="info-box-title">💡 Why 30% matters</div>
                     <div class="info-box-text">
-                        Credit utilization accounts for 30% of your credit score. Keeping your balance below 30% of your limit shows lenders you manage credit responsibly.
+                        <span class="term-tooltip">Credit utilization<span class="tooltip-content">% of credit limit you use</span></span> accounts for 30% of your credit score. Keeping your balance below 30% of your limit shows lenders you manage credit responsibly.
                     </div>
                 </div>
 
-                <button class="btn btn-primary" onclick="calculateUtilization()">Calculate</button>
+                <!-- ADDED: Consequence preview -->
+                <div class="consequence-box">
+                    <div class="consequence-box-title">⚠️ What happens if you exceed 30%?</div>
+                    <div class="consequence-box-text">
+                        Spending $<span id="excess-amount">400</span> of your $<span id="total-limit">500</span> limit (80% utilization) can lower your credit score by 50-100 points and make future approvals harder.
+                    </div>
+                </div>
 
                 <div class="info-box" style="margin-top: 24px;">
                     <div class="info-box-title">📝 Example</div>
                     <div class="info-box-text">
                         If your credit limit is $500:<br>
-                        • Spend up to $150 (30%)<br>
+                        • Spend up to $150 (30%) ✓<br>
                         • Pay full balance by due date<br>
-                        • Your score stays healthy ✓
+                        • Your score stays healthy
                     </div>
                 </div>
             </div>
@@ -1191,7 +1550,7 @@
             </div>
         </div>
 
-        <!-- SCREEN 4: BANK COMPARISON -->
+        <!-- SCREEN 4: BANK COMPARISON - HEAVILY UPDATED -->
         <div class="screen" id="screen-comparison">
             <div class="status-bar">
                 <span>9:41</span>
@@ -1204,100 +1563,145 @@
             </div>
 
             <div class="content">
+                <!-- UPDATED: Clearer filter labels with descriptions -->
                 <div class="section-title">Filter by your needs</div>
                 
                 <div class="filter-chips">
-                    <div class="filter-chip active">Accepts ITIN</div>
-                    <div class="filter-chip active">No minimum</div>
-                    <div class="filter-chip">Student friendly</div>
-                    <div class="filter-chip">No monthly fee</div>
+                    <div class="filter-chip active" data-description="Banks that accept ITIN instead of SSN">
+                        No SSN Required
+                    </div>
+                    <div class="filter-chip active" data-description="No minimum balance to keep account open">
+                        $0 Minimum Balance
+                    </div>
+                    <div class="filter-chip" data-description="Student-specific benefits and discounts">
+                        Student Perks
+                    </div>
+                    <div class="filter-chip" data-description="No monthly maintenance fees">
+                        $0 Monthly Fee
+                    </div>
+                </div>
+                <div class="filter-description">
+                    <em>Showing banks with: No SSN Required + $0 Minimum Balance</em>
                 </div>
 
                 <div class="section-title">3 banks match your filters</div>
 
-                <div class="comparison-card selected" onclick="selectBank(this)">
-                    <div class="comparison-header">
-                        <div class="comparison-bank-name">Chase Secure Banking</div>
-                        <div class="comparison-fee">$0/mo</div>
+                <!-- UPDATED: Side-by-side comparison with clear differences -->
+                <div class="comparison-container">
+                    <div class="comparison-card selected" onclick="selectBank(this)">
+                        <div class="recommended-badge">✓ RECOMMENDED</div>
+                        <div class="comparison-header">
+                            <div class="comparison-bank-name">Chase Secure</div>
+                            <div class="comparison-fee">$0/mo</div>
+                        </div>
+                        <div class="comparison-features">
+                            <div class="comparison-feature">
+                                <div class="check-icon">✓</div>
+                                <div>No SSN needed</div>
+                            </div>
+                            <div class="comparison-feature">
+                                <div class="check-icon">✓</div>
+                                <div><strong>$0 minimum</strong></div>
+                            </div>
+                            <div class="comparison-feature">
+                                <div class="check-icon">✓</div>
+                                <div>Free debit card</div>
+                            </div>
+                            <div class="comparison-feature">
+                                <div class="check-icon">✓</div>
+                                <div>Mobile deposit</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="comparison-features">
-                        <div class="comparison-feature">
-                            <div class="check-icon">✓</div>
-                            <div>Accepts ITIN (no SSN needed)</div>
+
+                    <div class="comparison-card" onclick="selectBank(this)">
+                        <div class="comparison-header">
+                            <div class="comparison-bank-name">Bank of America</div>
+                            <div class="comparison-fee">$4.95/mo</div>
                         </div>
-                        <div class="comparison-feature">
-                            <div class="check-icon">✓</div>
-                            <div>No minimum balance required</div>
+                        <div class="comparison-features">
+                            <div class="comparison-feature">
+                                <div class="check-icon">✓</div>
+                                <div>No SSN needed</div>
+                            </div>
+                            <div class="comparison-feature">
+                                <div class="check-icon">✓</div>
+                                <div><strong>$100 minimum</strong></div>
+                            </div>
+                            <div class="comparison-feature">
+                                <div class="check-icon">✓</div>
+                                <div>Zelle integrated</div>
+                            </div>
+                            <div class="comparison-feature">
+                                <div class="check-icon">✓</div>
+                                <div>More ATM locations</div>
+                            </div>
                         </div>
-                        <div class="comparison-feature">
-                            <div class="check-icon">✓</div>
-                            <div>Free debit card</div>
+                    </div>
+
+                    <div class="comparison-card" onclick="selectBank(this)">
+                        <div class="comparison-header">
+                            <div class="comparison-bank-name">Wells Fargo</div>
+                            <div class="comparison-fee">$5/mo</div>
                         </div>
-                        <div class="comparison-feature">
-                            <div class="check-icon">✓</div>
-                            <div>Mobile check deposit</div>
+                        <div class="comparison-features">
+                            <div class="comparison-feature">
+                                <div class="check-icon">✓</div>
+                                <div>No SSN needed</div>
+                            </div>
+                            <div class="comparison-feature">
+                                <div class="check-icon">✓</div>
+                                <div><strong>$500 minimum</strong></div>
+                            </div>
+                            <div class="comparison-feature">
+                                <div class="check-icon">✓</div>
+                                <div><span class="term-tooltip">Overdraft protection<span class="tooltip-content">Links to savings to prevent fees</span></span></div>
+                            </div>
+                            <div class="comparison-feature">
+                                <div class="check-icon">✓</div>
+                                <div>Student discounts</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="comparison-card" onclick="selectBank(this)">
-                    <div class="comparison-header">
-                        <div class="comparison-bank-name">Bank of America Advantage</div>
-                        <div class="comparison-fee">$4.95/mo</div>
+                <!-- ADDED: Comparison table for key differences -->
+                <div class="section-title">Quick Compare</div>
+                <div class="comparison-table">
+                    <div class="comparison-table-row">
+                        <div class="comparison-table-cell comparison-table-header comparison-table-label">Feature</div>
+                        <div class="comparison-table-cell comparison-table-header">Chase</div>
+                        <div class="comparison-table-cell comparison-table-header">BofA</div>
+                        <div class="comparison-table-cell comparison-table-header">Wells Fargo</div>
                     </div>
-                    <div class="comparison-features">
-                        <div class="comparison-feature">
-                            <div class="check-icon">✓</div>
-                            <div>Accepts ITIN</div>
-                        </div>
-                        <div class="comparison-feature">
-                            <div class="check-icon">✓</div>
-                            <div>$100 minimum balance</div>
-                        </div>
-                        <div class="comparison-feature">
-                            <div class="check-icon">✓</div>
-                            <div>Zelle integration</div>
-                        </div>
-                        <div class="comparison-feature">
-                            <div class="check-icon">✓</div>
-                            <div>Nationwide ATMs</div>
-                        </div>
+                    <div class="comparison-table-row">
+                        <div class="comparison-table-cell comparison-table-label">Monthly Fee</div>
+                        <div class="comparison-table-cell" style="color: #059669; font-weight: 600;">$0</div>
+                        <div class="comparison-table-cell">$4.95</div>
+                        <div class="comparison-table-cell">$5</div>
                     </div>
-                </div>
-
-                <div class="comparison-card" onclick="selectBank(this)">
-                    <div class="comparison-header">
-                        <div class="comparison-bank-name">Wells Fargo Everyday</div>
-                        <div class="comparison-fee">$5/mo</div>
+                    <div class="comparison-table-row">
+                        <div class="comparison-table-cell comparison-table-label">Min Balance</div>
+                        <div class="comparison-table-cell" style="color: #059669; font-weight: 600;">$0</div>
+                        <div class="comparison-table-cell">$100</div>
+                        <div class="comparison-table-cell">$500</div>
                     </div>
-                    <div class="comparison-features">
-                        <div class="comparison-feature">
-                            <div class="check-icon">✓</div>
-                            <div>Accepts ITIN</div>
-                        </div>
-                        <div class="comparison-feature">
-                            <div class="check-icon">✓</div>
-                            <div>$500 min balance OR direct deposit</div>
-                        </div>
-                        <div class="comparison-feature">
-                            <div class="check-icon">✓</div>
-                            <div>Overdraft protection</div>
-                        </div>
-                        <div class="comparison-feature">
-                            <div class="check-icon">✓</div>
-                            <div>Student discounts available</div>
-                        </div>
+                    <div class="comparison-table-row">
+                        <div class="comparison-table-cell comparison-table-label">SSN Required</div>
+                        <div class="comparison-table-cell" style="color: #059669; font-weight: 600;">No</div>
+                        <div class="comparison-table-cell" style="color: #059669; font-weight: 600;">No</div>
+                        <div class="comparison-table-cell" style="color: #059669; font-weight: 600;">No</div>
                     </div>
                 </div>
 
                 <div class="info-box">
-                    <div class="info-box-title">🎯 Best match for you</div>
+                    <div class="info-box-title">🎯 Why Chase is recommended</div>
                     <div class="info-box-text">
-                        Chase Secure Banking requires no SSN or minimum balance - perfect for newcomers building their financial foundation.
+                        Chase Secure Banking requires no SSN or minimum balance - perfect for newcomers. You save $60-120/year compared to other options with no tradeoffs.
                     </div>
                 </div>
 
-                <button class="btn btn-primary" onclick="navigateTo('screen-bank-detail')">View Details</button>
+                <button class="btn btn-primary" onclick="navigateTo('screen-bank-detail')">View Chase Details</button>
             </div>
 
             <div class="bottom-nav">
@@ -1430,7 +1834,7 @@
                             <strong style="color: #059669;">✓ Perfect for Newcomers</strong><br><br>
                             • No SSN required (ITIN accepted)<br>
                             • No minimum balance<br>
-                            • No overdraft fees<br>
+                            • No <span class="term-tooltip">overdraft fees<span class="tooltip-content">Charges when you spend more than available</span></span><br>
                             • Free debit card<br>
                             • Mobile check deposit<br>
                             • Access to 16,000+ ATMs<br>
@@ -1571,15 +1975,6 @@
         </div>
     </div>
 
-    <!-- Screen Navigation Controls -->
-    <div class="screen-controls">
-        <button onclick="navigateTo('screen-home')">Home</button>
-        <button onclick="navigateTo('screen-credit')">Credit</button>
-        <button onclick="navigateTo('screen-calculator')">Calculator</button>
-        <button onclick="navigateTo('screen-comparison')">Banks</button>
-        <button onclick="navigateTo('screen-search')">Search</button>
-    </div>
-
     <script>
         // Navigation
         function navigateTo(screenId) {
@@ -1616,16 +2011,42 @@
             card.classList.add('selected');
         }
 
-        // Calculate utilization
+        // Calculate utilization - UPDATED
         function calculateUtilization() {
             const limit = parseFloat(document.getElementById('credit-limit').value) || 500;
             const safeAmount = Math.floor(limit * 0.3);
+            const excessAmount = Math.floor(limit * 0.8);
             
             document.getElementById('safe-amount').textContent = '$' + safeAmount;
             document.getElementById('limit-display').textContent = '$' + limit;
+            document.getElementById('limit-value').textContent = limit;
+            document.getElementById('safe-value').textContent = safeAmount;
+            document.getElementById('excess-amount').textContent = excessAmount;
+            document.getElementById('total-limit').textContent = limit;
+            
             document.getElementById('result-display').style.display = 'block';
             document.getElementById('gauge-display').style.display = 'block';
             document.getElementById('gauge-fill').style.width = '30%';
+        }
+
+        // Toggle calculation breakdown
+        function toggleBreakdown() {
+            const breakdown = document.getElementById('breakdown');
+            breakdown.style.display = breakdown.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Toggle deadline detail - NEW
+        function toggleDeadlineDetail(item) {
+            const why = item.querySelector('.deadline-why');
+            const action = item.querySelector('.deadline-action');
+            
+            if (why.style.display === 'none') {
+                why.style.display = 'block';
+                action.style.display = 'block';
+            } else {
+                why.style.display = 'none';
+                action.style.display = 'none';
+            }
         }
 
         // Initialize calculator on load
