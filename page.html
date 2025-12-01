@@ -52,6 +52,7 @@
             height: 100%;
             overflow-y: auto;
             background: white;
+            padding-bottom: 80px;
         }
 
         .screen.active {
@@ -127,11 +128,12 @@
 
         /* Warning Banner (Primary Tier) */
         .warning-banner {
-            background: #fef2f2;
-            border: 2px solid #dc2626;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 2px solid #ef4444;
+            border-radius: 16px;
             padding: 16px;
             margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
         }
 
         .warning-header {
@@ -213,16 +215,17 @@
         .action-card {
             background: white;
             border: 1px solid #e5e7eb;
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .action-card:active {
             transform: scale(0.98);
-            background: #f9fafb;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
         .action-icon {
@@ -238,11 +241,12 @@
 
         /* Next Step Card */
         .next-step-card {
-            background: #eff6ff;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             border: 2px solid #3b82f6;
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 16px;
             margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
         }
 
         .next-step-title {
@@ -284,7 +288,7 @@
         .expansion-panel {
             background: #fafafa;
             border: 1px solid #e5e7eb;
-            border-radius: 12px;
+            border-radius: 16px;
             margin-bottom: 12px;
             overflow: hidden;
         }
@@ -479,21 +483,22 @@
         .comparison-card {
             background: white;
             border: 2px solid #e5e7eb;
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 16px;
             margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .comparison-card:active {
             transform: scale(0.98);
-            border-color: #3b82f6;
         }
 
         .comparison-card.selected {
             border-color: #3b82f6;
-            background: #eff6ff;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
         }
 
         .comparison-header {
@@ -576,14 +581,16 @@
             cursor: pointer;
             transition: all 0.2s;
             min-height: 56px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .btn:active {
             transform: scale(0.98);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
 
         .btn-primary {
-            background: #3b82f6;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
         }
 
@@ -591,6 +598,7 @@
             background: white;
             color: #3b82f6;
             border: 2px solid #3b82f6;
+            box-shadow: none;
         }
 
         .btn-group {
@@ -605,17 +613,15 @@
 
         /* Bottom Navigation */
         .bottom-nav {
-            position: fixed;
+            position: absolute;
             bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 375px;
-            max-width: 100%;
-            background: white;
-            border-top: 1px solid #e5e7eb;
+            left: 0;
+            right: 0;
+            background: #1f2937;
             display: flex;
             justify-content: space-around;
-            padding: 8px 0 20px 0;
+            padding: 8px 0 24px 0;
+            border-radius: 0 0 28px 28px;
         }
 
         .nav-item {
@@ -624,23 +630,36 @@
             align-items: center;
             gap: 4px;
             cursor: pointer;
-            padding: 8px 16px;
+            padding: 6px 12px;
+            border-radius: 12px;
             transition: all 0.2s;
+            min-width: 60px;
+        }
+
+        .nav-item:active {
+            transform: scale(0.95);
         }
 
         .nav-icon {
-            font-size: 24px;
+            font-size: 22px;
             color: #9ca3af;
+            transition: all 0.2s;
         }
 
         .nav-label {
             font-size: 11px;
             color: #9ca3af;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            background: #3b82f6;
         }
 
         .nav-item.active .nav-icon,
         .nav-item.active .nav-label {
-            color: #3b82f6;
+            color: white;
         }
 
         /* Search Bar */
@@ -802,32 +821,9 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Screen Controls */
+        /* Screen Controls - Hidden by default */
         .screen-controls {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            background: rgba(0,0,0,0.8);
-            padding: 12px 20px;
-            border-radius: 24px;
-            z-index: 2000;
-        }
-
-        .screen-controls button {
-            padding: 8px 16px;
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .screen-controls button:hover {
-            background: #2563eb;
+            display: none;
         }
     </style>
 </head>
